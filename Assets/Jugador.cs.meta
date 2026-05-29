@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 01fefb2e172cb474cab9990f8c255c1c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - prefabMuro: {instanceID: 0}
+  - prefabTorreta: {fileID: 171775808377693, guid: 4c755e0ecdd72704c95fad4459036b39, type: 3}
+  - prefabTorretaE: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
