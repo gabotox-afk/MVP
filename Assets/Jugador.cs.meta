@@ -5,7 +5,7 @@ MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - prefabMuro: {instanceID: 0}
-  - prefabTorreta: {fileID: 171775808377693, guid: 4c755e0ecdd72704c95fad4459036b39, type: 3}
+  - prefabTorreta: {instanceID: 0}
   - prefabTorretaE: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}

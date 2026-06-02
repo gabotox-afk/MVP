@@ -12,7 +12,6 @@ public class Jugador : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("El script se esta ejecutando");
         MoverJugador();
 
         if (Input.GetKeyDown(KeyCode.Alpha1)) // Tecla 1
