@@ -1,7 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class TorretaEspecial : MonoBehaviour
+public class TorretaAOE : MonoBehaviour
 {
     public float rango = 8f;
     public float cadencia = 1f;
@@ -63,14 +63,13 @@ public class TorretaEspecial : MonoBehaviour
 
         Vector3 posicionReal = transform.position;
 
-
         posicionReal.y += 1f;
 
         Debug.Log("BYPASS - Clonando bala en posición global: " + posicionReal);
 
         GameObject balaClonada = Instantiate(prefabala, posicionReal, transform.rotation);
 
-        BalaEspecial scriptBala = balaClonada.GetComponent<BalaEspecial>();
+        BalaAOE scriptBala = balaClonada.GetComponent<BalaAOE>();
         if (scriptBala != null)
         {
             scriptBala.ConfObj(EnemigoObjetivo);

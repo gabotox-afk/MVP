@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BalaEspecial : MonoBehaviour
+public class BalaAOE : MonoBehaviour
 {
     public float danio = 10f;
     public float velocidad = 15f;
