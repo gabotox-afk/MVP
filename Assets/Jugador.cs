@@ -2,13 +2,22 @@ using UnityEngine;
 
 public class Jugador : MonoBehaviour
 {
+    [Header("Configuracion de Movimiento")]
     public float velocidad = 5.0f;
+    public float suavidadRotacion = 10f; // Nueva variable para que gire suave
 
+    [Header("Referencias de Camara")]
+    public Transform camaraPrincipal; // <-- Nueva variable para arrastrar la Main Camera
+
+    [Header("Configuracion de Combate y Construccion")]
+    public float fuerzaDeEmpuje = 15f;
+    public float radioDeGolpe = 3f;
+    public float distanciaConstruccion = 2.0f;
+
+    [Header("Prefabs")]
     public GameObject prefabMuro;
     public GameObject prefabTorreta;
     public GameObject prefabTorretaE;
-
-    public float distanciaConstruccion = 2.0f;
 
     void Update()
     {
@@ -26,45 +35,86 @@ public class Jugador : MonoBehaviour
         {
             ConstruirObjeto(prefabTorretaE);
         }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            EmpujarEstructurasAdelante();
+        }
     }
 
     void MoverJugador()
     {
-        // Captura las flechas del teclado o las teclas WASD
-        float movimientoH = Input.GetAxis("Horizontal");
-        float movimientoV = Input.GetAxis("Vertical");
+        // 1. Captura las flechas del teclado o las teclas WASD de forma limpia
+        float movimientoH = Input.GetAxisRaw("Horizontal");
+        float movimientoV = Input.GetAxisRaw("Vertical");
 
-        // Calculamos el vector de movimiento basándonos en los ejes X y Z (suelo 3D)
-        Vector3 direccion = new Vector3(movimientoH, 0.0f, movimientoV);
+        Vector3 direccionInput = new Vector3(movimientoH, 0.0f, movimientoV).normalized;
 
-        // Movemos al jugador en esa dirección por el tiempo transcurrido
-        transform.Translate(direccion * velocidad * Time.deltaTime, Space.World);
-
-        // Hace que el jugador mire hacia la dirección en la que se mueve
-        if (direccion != Vector3.zero)
+        // 2. Si el jugador está presionando alguna tecla...
+        if (direccionInput.magnitude >= 0.1f)
         {
-            transform.forward = direccion;
+            // Buscamos hacia dónde está apuntando el frente y el costado de la cámara
+            Vector3 camaraFrente = camaraPrincipal.forward;
+            Vector3 camaraCostado = camaraPrincipal.right;
+
+            // Aplanamos el eje Y para que no camine lento si mirás al cielo o al suelo
+            camaraFrente.y = 0f;
+            camaraCostado.y = 0f;
+            camaraFrente.Normalize();
+            camaraCostado.Normalize();
+
+            // Calculamos la dirección de movimiento relativa a la cámara
+            Vector3 direccionMovimiento = (camaraFrente * movimientoV + camaraCostado * movimientoH).normalized;
+
+            // 3. Movemos al jugador en esa dirección relativa al mundo
+            transform.Translate(direccionMovimiento * velocidad * Time.deltaTime, Space.World);
+
+            // 4. Hacemos que gire de forma suave hacia la dirección en la que camina
+            Quaternion rotacionObjetivo = Quaternion.LookRotation(direccionMovimiento);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rotacionObjetivo, Time.deltaTime * suavidadRotacion);
         }
     }
 
     void ConstruirObjeto(GameObject prefab)
     {
-        // Verificamos que no intentemos instanciar algo vacío
         if (prefab == null)
         {
             Debug.LogWarning("¡Falta asignar el Prefab en el Inspector del Jugador!");
             return;
         }
 
-        // Calculamos la posición adelante del jugador para que no aparezca "adentro" de él
         Vector3 posicionSpawn = transform.position + transform.forward * distanciaConstruccion;
-
-        // Ajustamos la altura (Y) a 0.5f o la altura del suelo para que no flote (ajustable)
         posicionSpawn.y = 0.5f;
 
-        // Creamos el objeto en el mundo
         Instantiate(prefab, posicionSpawn, transform.rotation);
-
         Debug.Log("Objeto construido: " + prefab.name);
+    }
+
+    void EmpujarEstructurasAdelante()
+    {
+        Vector3 puntoGolpe = transform.position + transform.forward * 1.5f;
+        Collider[] objetosGolpeados = Physics.OverlapSphere(puntoGolpe, radioDeGolpe);
+
+        foreach (Collider col in objetosGolpeados)
+        {
+            if (col.CompareTag("Enemigo"))
+            {
+                EnemigoIA enemigo = col.GetComponent<EnemigoIA>();
+                if (enemigo != null)
+                {
+                    Vector3 direccion = (col.transform.position - transform.position).normalized;
+                    direccion.y = 0.1f;
+
+                    enemigo.EmpujarEnemigo(direccion, fuerzaDeEmpuje);
+                }
+            }
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Vector3 puntoGolpe = transform.position + transform.forward * 1.5f;
+        Gizmos.DrawWireSphere(puntoGolpe, radioDeGolpe);
     }
 }
