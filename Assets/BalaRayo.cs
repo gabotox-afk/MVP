@@ -58,10 +58,10 @@ public class BalaRayo : MonoBehaviour
                 if (vida != null)
                 {
                     vida.RecibirDanio(daniActual);
+                    yaGolpeados.Add(col.gameObject);
+                    RealizarRebotes(col.transform.position, daniActual * factorDecaimiento, rebotesRestantes - 1, yaGolpeados);
+                    return;
                 }
-                yaGolpeados.Add(col.gameObject);
-                RealizarRebotes(col.transform.position, daniActual * factorDecaimiento, rebotesRestantes - 1, yaGolpeados);
-                return;
             }
         }
     }
