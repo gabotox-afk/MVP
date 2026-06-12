@@ -152,6 +152,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d19e9d10a151de241803bbc59a967bfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemigoIA
+  danioAMuro: 10
+  rangoAtaqueMuro: 1.5
+  cadenciaAtaqueMuro: 1
+  rangoDeteccionMuro: 2.5
 --- !u!114 &-4966444872905874740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -164,7 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7af07796cd11a7c48915ee2ad5ec4d2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemigoVida
-  VidaMAxima: 30
+  VidaMaxima: 30
   VidaActual: 0
 --- !u!54 &-3583369432413500495
 Rigidbody:

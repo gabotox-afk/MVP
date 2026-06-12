@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class EnemigoVida : MonoBehaviour
+public class MuroVida : MonoBehaviour
 {
-    public float VidaMaxima = 30f;
+    public float VidaMaxima = 50f;
     public float VidaActual;
 
     private Renderer render;
@@ -23,11 +23,11 @@ public class EnemigoVida : MonoBehaviour
     {
         VidaActual -= danio;
 
-        // Feedback visual: el enemigo se oscurece a medida que pierde vida
+        // Feedback visual: el muro se va tiñendo de rojo a medida que pierde vida
         if (render != null)
         {
             float fraccion = Mathf.Clamp01(VidaActual / VidaMaxima);
-            render.material.color = Color.Lerp(Color.black, colorOriginal, 0.3f + 0.7f * fraccion);
+            render.material.color = Color.Lerp(new Color(0.7f, 0.15f, 0.1f), colorOriginal, fraccion);
         }
 
         if (VidaActual <= 0)

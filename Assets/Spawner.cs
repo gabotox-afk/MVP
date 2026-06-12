@@ -33,7 +33,5 @@ public class Spawner : MonoBehaviour
         Transform Punto = puntosS[indice];
 
         Instantiate(enemigo, Punto.position, Punto.rotation);
-
-        Debug.Log("Enemigo generado en: " + Punto.name);
     }
 }

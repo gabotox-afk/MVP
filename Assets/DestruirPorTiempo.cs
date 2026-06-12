@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class DestruirporTiempo : MonoBehaviour
+public class DestruirPorTiempo : MonoBehaviour
 {
     [Header("Configuracion")]
     public float tiempoDeVida = 8.0f; // El tiempo en segundos antes de borrarse

@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class TorretaAtaque : MonoBehaviour
@@ -6,22 +5,40 @@ public class TorretaAtaque : MonoBehaviour
     public float rango = 8f;
     public float cadencia = 1f;
     public float cronometro;
+    public float intervaloBusqueda = 0.25f; // cada cuánto re-buscamos objetivo (recorrer todos los enemigos es caro)
 
     public GameObject prefabala;
     public Transform puntoDisparo;
 
     private Transform EnemigoObjetivo;
+    private float cronometroBusqueda;
+
+    void Start()
+    {
+        // Desfasamos la primera búsqueda al azar para que todas las torretas
+        // no recorran la lista de enemigos en el mismo frame
+        cronometroBusqueda = Random.Range(0f, intervaloBusqueda);
+    }
 
     void Update()
     {
-        BuscarEnemigoCercano();
+        // Solo re-buscamos cada cierto intervalo, o enseguida si el objetivo
+        // actual murió o se fue del rango
+        cronometroBusqueda -= Time.deltaTime;
+        if (cronometroBusqueda <= 0f || !ObjetivoSigueValido())
+        {
+            cronometroBusqueda = intervaloBusqueda;
+            BuscarEnemigoCercano();
+        }
 
         if (EnemigoObjetivo != null)
         {
-            
             Vector3 direccion = EnemigoObjetivo.position - transform.position;
             direccion.y = 0;
-            transform.forward = direccion;
+            if (direccion.sqrMagnitude > 0.0001f)
+            {
+                transform.forward = direccion;
+            }
 
             cronometro += Time.deltaTime;
             if (cronometro >= cadencia)
@@ -32,6 +49,11 @@ public class TorretaAtaque : MonoBehaviour
         }
     }
 
+    bool ObjetivoSigueValido()
+    {
+        return EnemigoObjetivo != null
+            && Vector3.Distance(transform.position, EnemigoObjetivo.position) <= rango;
+    }
 
     void BuscarEnemigoCercano()
     {
@@ -60,13 +82,11 @@ public class TorretaAtaque : MonoBehaviour
 
     void Disparar()
     {
-        
-        Vector3 posicionReal = transform.position;
-
-
-        posicionReal.y += 1f;
-
-        Debug.Log("BYPASS - Clonando bala en posición global: " + posicionReal);
+        // Disparamos desde el punto de disparo si está asignado; si no, desde
+        // arriba de la torreta como antes
+        Vector3 posicionReal = puntoDisparo != null
+            ? puntoDisparo.position
+            : transform.position + Vector3.up;
 
         GameObject balaClonada = Instantiate(prefabala, posicionReal, transform.rotation);
 
