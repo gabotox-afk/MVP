@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 // Gestor de oleadas: en vez de spawnear un enemigo sin fin, organiza la partida
 // en oleadas con un descanso entre medio. La siguiente oleada empieza cuando se
@@ -18,6 +19,12 @@ public class Spawner : MonoBehaviour
     public int totalOleadas = 10;          // oleadas para ganar (modo Campaña)
     public int enemigosOleadaBase = 5;     // enemigos en la oleada 1
     public int enemigosPorOleadaExtra = 2; // cuantos enemigos mas suma cada oleada
+
+    [Header("Escalado por oleada")]
+    public float incrementoVidaPorOleada = 0.20f;      // +20% acumulativo
+    public float incrementoDanioPorOleada = 0.20f;     // +20% acumulativo (servidor y muros)
+    public float incrementoVelocidadPorOleada = 0.08f; // % de subida por oleada
+    public float velocidadMaxima = 15f;                // tope para que no lleguen instantaneos
 
     [Header("Modo")]
     public bool modoInfinito = false; // si es true, nunca gana y las oleadas no paran
@@ -177,6 +184,39 @@ public class Spawner : MonoBehaviour
         int indice = Random.Range(0, puntosS.Length);
         Transform punto = puntosS[indice];
 
-        Instantiate(enemigo, punto.position, punto.rotation);
+        GameObject inst = Instantiate(enemigo, punto.position, punto.rotation);
+        AplicarDificultad(inst);
+    }
+
+    // Escala vida, danio y velocidad del enemigo segun la oleada actual. La oleada 1
+    // queda igual que el prefab (factores en 1); de ahi en mas crece cada oleada.
+    void AplicarDificultad(GameObject inst)
+    {
+        int oleadasPasadas = oleadaActual - 1;
+        float factorVida = Mathf.Pow(1f + incrementoVidaPorOleada, oleadasPasadas);
+        float factorDanio = Mathf.Pow(1f + incrementoDanioPorOleada, oleadasPasadas);
+
+        // Vida: basta con setear VidaMaxima, el Start() del enemigo copia VidaActual
+        EnemigoVida vida = inst.GetComponent<EnemigoVida>();
+        if (vida != null)
+        {
+            vida.VidaMaxima *= factorVida;
+        }
+
+        // Danio al servidor (int, redondeado) y a los muros (float)
+        EnemigoIA ia = inst.GetComponent<EnemigoIA>();
+        if (ia != null)
+        {
+            ia.danioAlServidor = Mathf.RoundToInt(ia.danioAlServidor * factorDanio);
+            ia.danioAMuro *= factorDanio;
+        }
+
+        // Velocidad: crece lineal y se topa para que no lleguen instantaneos
+        NavMeshAgent agente = inst.GetComponent<NavMeshAgent>();
+        if (agente != null)
+        {
+            float velocidad = agente.speed * (1f + incrementoVelocidadPorOleada * oleadasPasadas);
+            agente.speed = Mathf.Min(velocidad, velocidadMaxima);
+        }
     }
 }

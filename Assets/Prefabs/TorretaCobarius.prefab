@@ -129,7 +129,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 280eaac2486b40c42a19df72636c1f84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DestruirporTiempo
-  tiempoDeVida: 8
+  tiempoDeVida: 30
+  tiempoDeAviso: 10
+  velocidadParpadeo: 8
 --- !u!114 &2991284149272860958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -145,6 +147,7 @@ MonoBehaviour:
   rango: 8
   cadencia: 1
   cronometro: 0
+  intervaloBusqueda: 0.25
   prefabala: {fileID: 7594225490438089134, guid: ff33f0c24214aab4c84629d2c8780a46, type: 3}
   puntoDisparo: {fileID: 0}
 --- !u!1001 &8668156460581788297

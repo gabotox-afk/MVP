@@ -7,6 +7,7 @@ public class EnemigoVida : MonoBehaviour
 
     private Renderer render;
     private Color colorOriginal;
+    private IndicadorVidaEnemigo indicador;
 
     void Start()
     {
@@ -17,6 +18,10 @@ public class EnemigoVida : MonoBehaviour
         {
             colorOriginal = render.material.color;
         }
+
+        // Numero de vida flotante sobre la cabeza
+        indicador = IndicadorVidaEnemigo.Crear(transform);
+        indicador.Actualizar(VidaActual, VidaMaxima);
     }
 
     public void RecibirDanio(float danio)
@@ -28,6 +33,11 @@ public class EnemigoVida : MonoBehaviour
         {
             float fraccion = Mathf.Clamp01(VidaActual / VidaMaxima);
             render.material.color = Color.Lerp(Color.black, colorOriginal, 0.3f + 0.7f * fraccion);
+        }
+
+        if (indicador != null)
+        {
+            indicador.Actualizar(VidaActual, VidaMaxima);
         }
 
         if (VidaActual <= 0)
