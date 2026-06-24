@@ -378,7 +378,7 @@ public class EnemigoIA : MonoBehaviour
     // Último recurso: recorre todos los muros de la escena y elige el más cercano
     private MuroVida BuscarMuroMasCercanoEnEscena()
     {
-        MuroVida[] muros = FindObjectsByType<MuroVida>(FindObjectsSortMode.None);
+        MuroVida[] muros = FindObjectsByType<MuroVida>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
 
         MuroVida mejorMuro = null;
         float distanciaMasCercana = Mathf.Infinity;

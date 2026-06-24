@@ -45,10 +45,11 @@ public class MenuPrincipal : MonoBehaviour
         // Panel principal con el título y los 4 botones
         panelPrincipal = CrearPanel(canvas.transform, "PanelPrincipal");
         CrearTitulo(panelPrincipal.transform, tituloDelJuego);
-        CrearBoton(panelPrincipal.transform, "Jugar", 60f, Jugar);
-        CrearBoton(panelPrincipal.transform, "Personaje", -20f, AbrirPersonaje);
-        CrearBoton(panelPrincipal.transform, "Opciones", -100f, AbrirOpciones);
-        CrearBoton(panelPrincipal.transform, "Salir", -180f, Salir);
+        CrearBoton(panelPrincipal.transform, "Campaña", 100f, JugarCampania);
+        CrearBoton(panelPrincipal.transform, "Infinito", 20f, JugarInfinito);
+        CrearBoton(panelPrincipal.transform, "Personaje", -60f, AbrirPersonaje);
+        CrearBoton(panelPrincipal.transform, "Opciones", -140f, AbrirOpciones);
+        CrearBoton(panelPrincipal.transform, "Salir", -220f, Salir);
 
         // Ruleta de personajes
         panelPersonaje = CrearPanelPersonaje(canvas.transform);
@@ -75,8 +76,15 @@ public class MenuPrincipal : MonoBehaviour
 
     // ---------- Acciones de los botones ----------
 
-    void Jugar()
+    void JugarCampania()
     {
+        ModoJuego.Elegido = ModoJuego.Modo.Campaña;
+        SceneManager.LoadScene(escenaDelJuego);
+    }
+
+    void JugarInfinito()
+    {
+        ModoJuego.Elegido = ModoJuego.Modo.Infinito;
         SceneManager.LoadScene(escenaDelJuego);
     }
 
@@ -237,7 +245,7 @@ public class MenuPrincipal : MonoBehaviour
     void CrearEventSystem()
     {
         // Sin EventSystem los botones no reciben clicks
-        if (FindFirstObjectByType<EventSystem>() != null)
+        if (FindAnyObjectByType<EventSystem>() != null)
         {
             return;
         }

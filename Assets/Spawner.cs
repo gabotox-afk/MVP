@@ -26,6 +26,10 @@ public class Spawner : MonoBehaviour
     public float incrementoVelocidadPorOleada = 0.08f; // % de subida por oleada
     public float velocidadMaxima = 15f;                // tope para que no lleguen instantaneos
 
+    [Header("Saltos de dificultad (sobre el escalado base)")]
+    public float multiplicadorCada10 = 1.5f;   // x1.5 a vida y danio por cada 10 oleadas superadas
+    public float multiplicadorCada100 = 4f;     // x4 EXTRA a vida y danio por cada 100 oleadas superadas
+
     [Header("Modo")]
     public bool modoInfinito = false; // si es true, nunca gana y las oleadas no paran
 
@@ -41,7 +45,7 @@ public class Spawner : MonoBehaviour
 
     void Start()
     {
-        hud = FindFirstObjectByType<HUDJuego>();
+        hud = FindAnyObjectByType<HUDJuego>();
 
         // El modo se decide en el menu (por ahora siempre Campaña); si el flag
         // del Inspector ya esta en true, respetamos eso tambien
@@ -195,6 +199,17 @@ public class Spawner : MonoBehaviour
         int oleadasPasadas = oleadaActual - 1;
         float factorVida = Mathf.Pow(1f + incrementoVidaPorOleada, oleadasPasadas);
         float factorDanio = Mathf.Pow(1f + incrementoDanioPorOleada, oleadasPasadas);
+
+        // Saltos de dificultad ENCIMA del escalado base: cada 10 oleadas un salto,
+        // y cada 100 un salto mucho mas grande. Acumulativos por cada bloque superado:
+        // oleada 25 -> 2 saltos de 10; oleada 250 -> 25 saltos de 10 y 2 de 100.
+        int saltosDe10 = oleadaActual / 10;
+        int saltosDe100 = oleadaActual / 100;
+        float factorSaltos = Mathf.Pow(multiplicadorCada10, saltosDe10)
+            * Mathf.Pow(multiplicadorCada100, saltosDe100);
+
+        factorVida *= factorSaltos;
+        factorDanio *= factorSaltos;
 
         // Vida: basta con setear VidaMaxima, el Start() del enemigo copia VidaActual
         EnemigoVida vida = inst.GetComponent<EnemigoVida>();

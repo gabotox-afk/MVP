@@ -130,7 +130,7 @@ public class MenuPausa : MonoBehaviour
 
     void CrearEventSystem()
     {
-        if (FindFirstObjectByType<EventSystem>() != null)
+        if (FindAnyObjectByType<EventSystem>() != null)
         {
             return;
         }

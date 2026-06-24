@@ -130,7 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 280eaac2486b40c42a19df72636c1f84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DestruirporTiempo
-  tiempoDeVida: 20
+  tiempoDeVida: 30
 --- !u!114 &-8000644451371568271
 MonoBehaviour:
   m_ObjectHideFlags: 0

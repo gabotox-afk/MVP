@@ -52,7 +52,7 @@ public class HUDJuego : MonoBehaviour
     {
         JuegoTerminado = false;
 
-        servidor = FindFirstObjectByType<Servidor>();
+        servidor = FindAnyObjectByType<Servidor>();
         if (servidor == null)
         {
             Debug.LogError("HUD: no se encontro el Servidor en la escena");
@@ -154,6 +154,20 @@ public class HUDJuego : MonoBehaviour
         }
 
         textoAviso.text = "Limite de " + NombreLegible(tag) + " alcanzado (" + maximo + ")";
+        textoAviso.color = new Color(colorVidaVacia.r, colorVidaVacia.g, colorVidaVacia.b, 1f);
+        cronometroAviso = 2.0f; // segundos visible antes de desvanecerse
+    }
+
+    // Avisa que un tipo de torreta esta en cooldown de colocacion
+    public void AvisarCooldown(string tag, float segundosRestantes)
+    {
+        if (textoAviso == null)
+        {
+            return;
+        }
+
+        int segundos = Mathf.CeilToInt(Mathf.Max(0f, segundosRestantes));
+        textoAviso.text = "Recarga de " + NombreLegible(tag) + " (" + segundos + "s)";
         textoAviso.color = new Color(colorVidaVacia.r, colorVidaVacia.g, colorVidaVacia.b, 1f);
         cronometroAviso = 2.0f; // segundos visible antes de desvanecerse
     }

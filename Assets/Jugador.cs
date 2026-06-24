@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Jugador : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class Jugador : MonoBehaviour
     [Header("Configuracion de Combate y Construccion")]
     public float fuerzaDeEmpuje = 15f;
     public float radioDeGolpe = 3f;
+    public float anguloConoEmpuje = 90f; // apertura total del cono frontal del empuje
     public float distanciaConstruccion = 2.0f;
 
     [Header("Prefabs")]
@@ -37,13 +39,19 @@ public class Jugador : MonoBehaviour
     [Header("Limites de construccion (por tag)")]
     public LimiteEstructura[] limites;
 
+    [Header("Cooldown de torretas")]
+    public float cooldownTorreta = 5f; // segundos entre colocaciones del mismo tipo
+
+    // Por cada tag de torreta, el instante (Time.time) en que se libera su cooldown
+    private readonly Dictionary<string, float> proximaColocacion = new Dictionary<string, float>();
+
     private CapsuleCollider miCollider;
     private HUDJuego hud;
 
     void Start()
     {
         miCollider = GetComponent<CapsuleCollider>();
-        hud = FindFirstObjectByType<HUDJuego>();
+        hud = FindAnyObjectByType<HUDJuego>();
 
         // Si nadie arrastró la cámara en el Inspector, usamos la principal de la escena
         if (camaraPrincipal == null && Camera.main != null)
@@ -264,15 +272,34 @@ public class Jugador : MonoBehaviour
             return;
         }
 
-        // Si este tipo tiene un limite y ya esta lleno, no construimos y avisamos
-        LimiteEstructura limite = BuscarLimite(prefab.tag);
-        if (limite != null && ContarVivos(prefab.tag) >= limite.maximo)
+        bool esTorreta = prefab.tag.StartsWith("Torreta");
+
+        if (esTorreta)
         {
-            if (hud != null)
+            // Las torretas no tienen limite de cantidad, pero si cooldown por tipo:
+            // tras colocar una de un tipo hay que esperar para volver a colocar ese tipo
+            if (EnCooldown(prefab.tag))
             {
-                hud.AvisarLimite(prefab.tag, limite.maximo);
+                if (hud != null)
+                {
+                    float restante = proximaColocacion[prefab.tag] - Time.time;
+                    hud.AvisarCooldown(prefab.tag, restante);
+                }
+                return;
             }
-            return;
+        }
+        else
+        {
+            // Estructuras no-torreta (muros): mantienen el limite de cantidad por tag
+            LimiteEstructura limite = BuscarLimite(prefab.tag);
+            if (limite != null && ContarVivos(prefab.tag) >= limite.maximo)
+            {
+                if (hud != null)
+                {
+                    hud.AvisarLimite(prefab.tag, limite.maximo);
+                }
+                return;
+            }
         }
 
         Vector3 posicionSpawn = transform.position + transform.forward * distanciaConstruccion;
@@ -280,11 +307,26 @@ public class Jugador : MonoBehaviour
 
         Instantiate(prefab, posicionSpawn, transform.rotation);
 
-        // Refrescamos el contador del HUD con el nuevo total
-        if (hud != null && limite != null)
+        if (esTorreta)
         {
-            hud.ActualizarContador(prefab.tag, ContarVivos(prefab.tag), limite.maximo);
+            // Arrancamos el cooldown de este tipo de torreta
+            proximaColocacion[prefab.tag] = Time.time + cooldownTorreta;
         }
+        else
+        {
+            // Refrescamos el contador del HUD con el nuevo total (solo estructuras con limite)
+            LimiteEstructura limite = BuscarLimite(prefab.tag);
+            if (hud != null && limite != null)
+            {
+                hud.ActualizarContador(prefab.tag, ContarVivos(prefab.tag), limite.maximo);
+            }
+        }
+    }
+
+    // True si el tag de torreta todavia esta esperando su cooldown
+    bool EnCooldown(string tag)
+    {
+        return proximaColocacion.TryGetValue(tag, out float liberacion) && Time.time < liberacion;
     }
 
     // Muestra todos los contadores en el HUD al empezar (en su valor actual)
@@ -343,6 +385,17 @@ public class Jugador : MonoBehaviour
                 EnemigoIA enemigo = col.GetComponent<EnemigoIA>();
                 if (enemigo != null)
                 {
+                    // Solo empujamos lo que esta en el cono frontal (descartamos
+                    // costados extremos y espalda)
+                    Vector3 haciaEnemigo = col.transform.position - transform.position;
+                    haciaEnemigo.y = 0f;
+                    if (Vector3.Angle(transform.forward, haciaEnemigo) > anguloConoEmpuje * 0.5f)
+                    {
+                        continue;
+                    }
+
+                    // Direccion radial original: cada enemigo sale alejandose de
+                    // nuestro centro (el empuje en abanico que ya nos gustaba)
                     Vector3 direccion = (col.transform.position - transform.position).normalized;
                     direccion.y = 0.1f;
 
