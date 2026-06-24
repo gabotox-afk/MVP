@@ -24,11 +24,26 @@ public class Jugador : MonoBehaviour
     public GameObject prefabTorretaCadena; // Cobarius
     public GameObject prefabTorretaNinja;  // Ninja
 
+    // Limite de cuantas estructuras de un tipo puede haber vivas a la vez.
+    // Se cuenta por tag: cada prefab construible debe tener su tag asignado
+    // en el Inspector (Muro, Torreta, TorretaAOE, etc.)
+    [System.Serializable]
+    public class LimiteEstructura
+    {
+        public string tag = "Muro"; // Tag del prefab a limitar
+        public int maximo = 3;      // Cuantos puede haber vivos a la vez
+    }
+
+    [Header("Limites de construccion (por tag)")]
+    public LimiteEstructura[] limites;
+
     private CapsuleCollider miCollider;
+    private HUDJuego hud;
 
     void Start()
     {
         miCollider = GetComponent<CapsuleCollider>();
+        hud = FindFirstObjectByType<HUDJuego>();
 
         // Si nadie arrastró la cámara en el Inspector, usamos la principal de la escena
         if (camaraPrincipal == null && Camera.main != null)
@@ -36,7 +51,46 @@ public class Jugador : MonoBehaviour
             camaraPrincipal = Camera.main.transform;
         }
 
+        // Primero resolvemos qué torreta especial usa este personaje...
         AplicarPersonajeElegido();
+        // ...para descartar del HUD las especiales de los otros personajes...
+        FiltrarLimitesDelPersonaje();
+        // ...y recién ahí mostrar los contadores que de verdad va a usar.
+        InicializarContadores();
+    }
+
+    // Deja en la lista de limites solo las torretas especiales que este personaje
+    // puede construir: la suya (el tag de prefabTorretaE) y los tipos no-especiales
+    // (muro, torreta normal). Asi el HUD no muestra contadores de torretas ajenas.
+    void FiltrarLimitesDelPersonaje()
+    {
+        if (limites == null)
+        {
+            return;
+        }
+
+        // Tags de torretas especiales: solo una sobrevive, la del personaje
+        string[] tagsEspeciales = { "TorretaAOE", "TorretaCadena", "TorretaNinja" };
+        string tagMiEspecial = prefabTorretaE != null ? prefabTorretaE.tag : "";
+
+        var filtrados = new System.Collections.Generic.List<LimiteEstructura>();
+        foreach (LimiteEstructura limite in limites)
+        {
+            if (limite == null)
+            {
+                continue;
+            }
+
+            bool esEspecial = System.Array.IndexOf(tagsEspeciales, limite.tag) >= 0;
+
+            // Las no-especiales siempre pasan; las especiales solo si son la del personaje
+            if (!esEspecial || limite.tag == tagMiEspecial)
+            {
+                filtrados.Add(limite);
+            }
+        }
+
+        limites = filtrados.ToArray();
     }
 
     // La torreta especial (tecla 3) y el color del jugador dependen del personaje
@@ -210,10 +264,71 @@ public class Jugador : MonoBehaviour
             return;
         }
 
+        // Si este tipo tiene un limite y ya esta lleno, no construimos y avisamos
+        LimiteEstructura limite = BuscarLimite(prefab.tag);
+        if (limite != null && ContarVivos(prefab.tag) >= limite.maximo)
+        {
+            if (hud != null)
+            {
+                hud.AvisarLimite(prefab.tag, limite.maximo);
+            }
+            return;
+        }
+
         Vector3 posicionSpawn = transform.position + transform.forward * distanciaConstruccion;
         posicionSpawn.y = 0.5f;
 
         Instantiate(prefab, posicionSpawn, transform.rotation);
+
+        // Refrescamos el contador del HUD con el nuevo total
+        if (hud != null && limite != null)
+        {
+            hud.ActualizarContador(prefab.tag, ContarVivos(prefab.tag), limite.maximo);
+        }
+    }
+
+    // Muestra todos los contadores en el HUD al empezar (en su valor actual)
+    void InicializarContadores()
+    {
+        if (hud == null || limites == null)
+        {
+            return;
+        }
+
+        foreach (LimiteEstructura limite in limites)
+        {
+            if (limite != null)
+            {
+                hud.ActualizarContador(limite.tag, ContarVivos(limite.tag), limite.maximo);
+            }
+        }
+    }
+
+    // Devuelve la regla de limite para un tag, o null si ese tag no esta limitado
+    LimiteEstructura BuscarLimite(string tag)
+    {
+        if (limites == null)
+        {
+            return null;
+        }
+
+        foreach (LimiteEstructura limite in limites)
+        {
+            if (limite != null && limite.tag == tag)
+            {
+                return limite;
+            }
+        }
+
+        return null;
+    }
+
+    // Cuenta cuantos objetos vivos hay con ese tag. Como las torretas temporales
+    // se autodestruyen, su tag desaparece del conteo solo: el slot se libera sin
+    // que tengamos que notificar nada.
+    int ContarVivos(string tag)
+    {
+        return GameObject.FindGameObjectsWithTag(tag).Length;
     }
 
     void EmpujarEstructurasAdelante()

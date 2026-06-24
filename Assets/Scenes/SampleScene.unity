@@ -967,6 +967,17 @@ MonoBehaviour:
   prefabTorretaAOE: {fileID: 492361273839947981, guid: 4ba10303898ee51468224f49217f44f0, type: 3}
   prefabTorretaCadena: {fileID: 492361273839947981, guid: 2cd8153ff1b1eb44ba1cfb01557b10c0, type: 3}
   prefabTorretaNinja: {fileID: 492361273839947981, guid: 7cd9d136f6c6c27488b7c6a04fe0eded, type: 3}
+  limites:
+  - tag: Muro
+    maximo: 5
+  - tag: Torreta
+    maximo: 3
+  - tag: TorretaAOE
+    maximo: 2
+  - tag: TorretaCadena
+    maximo: 2
+  - tag: TorretaNinja
+    maximo: 2
 --- !u!136 &1058959896
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1097,7 +1108,12 @@ MonoBehaviour:
   - {fileID: 3192428}
   - {fileID: 525397586}
   - {fileID: 718081828}
-  tiempoEntreSpawn: 3
+  tiempoEntreSpawn: 1.5
+  tiempoDescanso: 8
+  totalOleadas: 10
+  enemigosOleadaBase: 5
+  enemigosPorOleadaExtra: 2
+  modoInfinito: 0
 --- !u!4 &1168057892
 Transform:
   m_ObjectHideFlags: 0
@@ -1201,6 +1217,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ba27b5a2905499b9caa9c1ba003cd7a, type: 3}
   m_Name:
   m_EditorClassIdentifier:
+  nombresEstructuras:
+  - tag: Muro
+    nombre: Muros
+  - tag: Torreta
+    nombre: Torretas
+  - tag: TorretaAOE
+    nombre: Torreta AOE
+  - tag: TorretaCadena
+    nombre: Torreta Cadena
+  - tag: TorretaNinja
+    nombre: Torreta Ninja
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

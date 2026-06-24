@@ -7,6 +7,10 @@ TagManager:
   - Enemigo
   - Muro
   - Servidor
+  - Torreta
+  - TorretaAOE
+  - TorretaCadena
+  - TorretaNinja
   layers:
   - Default
   - TransparentFX

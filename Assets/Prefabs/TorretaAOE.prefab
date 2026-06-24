@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -6872894903263826130}
   m_Layer: 0
   m_Name: TorretaAOE
-  m_TagString: Untagged
+  m_TagString: TorretaAOE
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
