@@ -10,22 +10,11 @@ public class Servidor : MonoBehaviour
         VidaActual = VidaMaxima;
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("ALGO TOCO EL SERVIDOR: " + other.gameObject.name);
-
-        if (other.CompareTag("Enemigo"))
-        {
-            RecibirDanio(10);
-
-            Destroy(other.gameObject);
-        }
-    }
-
+    // El daño ahora lo aplica EnemigoIA por distancia (un solo camino de daño,
+    // configurable con danioAlServidor): ya no usamos el trigger físico
     public void RecibirDanio(int danio)
     {
         VidaActual -= danio;
-        Debug.Log("¡El servidor sufrio danio! Integridad actual: " + VidaActual);
 
         if (VidaActual <= 0)
         {
