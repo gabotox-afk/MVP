@@ -188,9 +188,9 @@ Assets/Enemigo/**/*.jpg -filter -diff -merge
 Assets/Enemigo/**/*.png -filter -diff -merge
 Assets/Enemigo/**/*.tga -filter -diff -merge
 Assets/musica/**/*.mp3 -filter -diff -merge
-Assets/Snow Mountain/**/*.hdr -filter -diff -merge
-Assets/Snow Mountain/**/*.tga -filter -diff -merge
-Assets/Snow Mountain/**/*.fbx -filter -diff -merge
+"Assets/Snow Mountain/**/*.hdr" -filter -diff -merge
+"Assets/Snow Mountain/**/*.tga" -filter -diff -merge
+"Assets/Snow Mountain/**/*.fbx" -filter -diff -merge
 Assets/YughuesFreeGroundMaterials/**/*.tga -filter -diff -merge
 Assets/YughuesFreeGroundMaterials/**/*.fbx -filter -diff -merge
 Assets/TutorialInfo/**/* -filter -diff -merge
