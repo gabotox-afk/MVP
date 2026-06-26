@@ -174,4 +174,8 @@ LightingData.asset     binary
 Assets/Mago/**/*.fbx -filter -diff -merge
 Assets/Mago/*.fbx -filter -diff -merge
 Assets/Mago/**/*.jpg -filter -diff -merge
+Assets/Ninja/**/*.fbx -filter -diff -merge
+Assets/Ninja/*.fbx -filter -diff -merge
+Assets/Ninja/**/*.jpg -filter -diff -merge
+Assets/Ninja/**/*.png -filter -diff -merge
 Assets/TutorialInfo/**/* -filter -diff -merge
