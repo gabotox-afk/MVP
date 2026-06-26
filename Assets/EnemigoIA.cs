@@ -15,7 +15,7 @@ public class EnemigoIA : MonoBehaviour
 
     [Header("Ataque al Servidor")]
     public int danioAlServidor = 10;
-    public float rangoAtaqueServidor = 1.5f; // distancia al borde del servidor para explotar contra él
+    public float rangoAtaqueServidor = 0.5f; // distancia al borde del servidor para explotar contra él (debe llegar casi pegado)
 
     private float cronometroAtaqueMuro;
     private MuroVida muroObjetivo;
@@ -96,7 +96,12 @@ public class EnemigoIA : MonoBehaviour
         Vector3 distanciaAlServidor = puntoServidor - transform.position;
         distanciaAlServidor.y = 0f;
 
-        if (distanciaAlServidor.magnitude <= rangoAtaqueServidor)
+        // ¿Tenemos línea de visión libre al servidor (sin muros en medio)?
+        bool visionLibre = HayLineaDeVisionAlServidor(puntoServidor);
+
+        // Solo explotamos si estamos en rango Y hay línea de visión libre: si hay un muro
+        // cruzando entre nosotros y el servidor no podemos atravesarlo.
+        if (distanciaAlServidor.magnitude <= rangoAtaqueServidor && visionLibre)
         {
             if (scriptServidor != null)
             {
@@ -106,7 +111,13 @@ public class EnemigoIA : MonoBehaviour
             return;
         }
 
-        if (!caminoBloqueado)
+        // Estamos en rango del servidor pero un muro nos tapa la visión: no sirve seguir
+        // acercándonos (ya estamos pegados y no podemos explotar). Forzamos el modo "romper
+        // muro" para tirar abajo el que nos separa, aunque el NavMesh crea que hay camino.
+        bool bloqueadoPorMuroCercano =
+            distanciaAlServidor.magnitude <= rangoAtaqueServidor && !visionLibre;
+
+        if (!caminoBloqueado && !bloqueadoPorMuroCercano)
         {
             // Camino libre: prioridad total al servidor, soltamos cualquier muro.
             // Vamos al punto de ataque alcanzable que encontró el chequeo de camino
@@ -332,6 +343,40 @@ public class EnemigoIA : MonoBehaviour
         }
 
         return mejorMuro;
+    }
+
+    // ¿Hay línea de visión libre (sin muros) entre el enemigo y el servidor? Tira un rayo
+    // hasta el punto del servidor y devuelve false si lo primero que cruza es un muro. Así
+    // el enemigo no puede explotar "a través" de un muro que lo separa del servidor.
+    private bool HayLineaDeVisionAlServidor(Vector3 puntoServidor)
+    {
+        // El rayo viaja horizontal a la altura del centro del enemigo (su propia Y, ~1):
+        // ahí los muros siempre tienen cuerpo. No elevamos más, porque por encima de ~1.5
+        // el muro ya no llega (mide ~1.93 de alto centrado en y=0.5, tope ~1.46) y el rayo
+        // pasaría por arriba sin detectarlo, dejando explotar al enemigo a través del muro.
+        Vector3 origen = transform.position;
+        Vector3 destino = puntoServidor;
+        destino.y = origen.y;
+
+        Vector3 direccion = destino - origen;
+        float distancia = direccion.magnitude;
+        if (distancia < 0.0001f)
+        {
+            return true;
+        }
+
+        // Solo nos importa el muro más cercano en la línea: si el primer impacto relevante
+        // es un muro, no hay visión libre
+        RaycastHit[] impactos = Physics.RaycastAll(origen, direccion.normalized, distancia);
+        foreach (RaycastHit impacto in impactos)
+        {
+            if (impacto.collider.CompareTag("Muro"))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // Tira un rayo desde el enemigo hacia el servidor y devuelve el primer muro
