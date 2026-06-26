@@ -277,6 +277,17 @@ public class Jugador : MonoBehaviour
         }
     }
 
+    // Dispara el trigger de un baile en el Animator del modelo. Lo usa la ruleta de
+    // bailes (MenuBailes): el menú elige el trigger y acá lo lanzamos. Si el modelo no
+    // tiene Animator no hace nada.
+    public void Bailar(string triggerBaile)
+    {
+        if (animator != null && !string.IsNullOrEmpty(triggerBaile))
+        {
+            animator.SetTrigger(triggerBaile);
+        }
+    }
+
     void MoverJugador()
     {
         // Sin cámara no podemos calcular la dirección relativa: salimos sin crashear

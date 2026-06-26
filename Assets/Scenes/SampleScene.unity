@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 200001}
   - component: {fileID: 200002}
+  - component: {fileID: 200003}
   m_Layer: 0
   m_Name: MenuPausa
   m_TagString: Untagged
@@ -164,6 +165,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   escenaMenuInicial: MenuPrincipal
+  colorFondo: {r: 0, g: 0, b: 0, a: 0.7}
+  colorBoton: {r: 0.17, g: 0.24, b: 0.35, a: 1}
+  colorBotonResaltado: {r: 0.25, g: 0.36, b: 0.52, a: 1}
+  colorTexto: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &200003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 200000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 708ed2fd96fa4153b3fff17ce95faed7, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  bailes:
+  - etiqueta: Baile 1
+    trigger: Baile1
+  - etiqueta: Baile 2
+    trigger: Baile2
+  - etiqueta: Baile 3
+    trigger: Baile3
   colorFondo: {r: 0, g: 0, b: 0, a: 0.7}
   colorBoton: {r: 0.17, g: 0.24, b: 0.35, a: 1}
   colorBotonResaltado: {r: 0.25, g: 0.36, b: 0.52, a: 1}
