@@ -26,6 +26,9 @@ public class MenuPrincipal : MonoBehaviour
 
     // Ruleta de personajes
     private GameObject[] previewsPersonajes;
+    // Animator de cada preview (puede ser null si el prefab no tiene uno), para forzar su
+    // estado idle al mostrarlo en la ruleta.
+    private Animator[] animatorsPreview;
     private Text textoNombrePersonaje;
     private Text textoDescripcionPersonaje;
     private Text textoBotonAceptar;
@@ -167,31 +170,28 @@ public class MenuPrincipal : MonoBehaviour
         Shader shaderUnlit = Shader.Find("Universal Render Pipeline/Unlit");
 
         previewsPersonajes = new GameObject[SeleccionPersonaje.Personajes.Length];
+        animatorsPreview = new Animator[SeleccionPersonaje.Personajes.Length];
 
         for (int i = 0; i < SeleccionPersonaje.Personajes.Length; i++)
         {
             SeleccionPersonaje.DatosPersonaje datos = SeleccionPersonaje.Personajes[i];
 
-            PrimitiveType primitiva = PrimitiveType.Capsule;
-            if (datos.forma == SeleccionPersonaje.Forma.Cubo) primitiva = PrimitiveType.Cube;
-            if (datos.forma == SeleccionPersonaje.Forma.Esfera) primitiva = PrimitiveType.Sphere;
-
-            GameObject preview = GameObject.CreatePrimitive(primitiva);
-            preview.name = "Preview_" + datos.nombre;
-
-            // Frente a la cámara del menú (está en 0,1,-10 mirando hacia +Z)
-            preview.transform.position = new Vector3(0f, 1f, -7f);
-            preview.transform.localScale = Vector3.one * 1.4f;
-
-            // El collider de la primitiva no sirve para nada en el menú
-            Destroy(preview.GetComponent<Collider>());
-
-            Renderer render = preview.GetComponent<Renderer>();
-            if (shaderUnlit != null)
+            // Preferimos el modelo real del personaje (Resources/Personajes/<nombre>).
+            // Si no existe el prefab, caemos a la primitiva de color como antes.
+            GameObject prefab = datos.CargarModelo();
+            GameObject preview;
+            if (prefab != null)
             {
-                render.material = new Material(shaderUnlit);
+                preview = Instantiate(prefab);
+                preview.name = "Preview_" + datos.nombre;
+                AjustarPreviewModelo(preview, shaderUnlit);
+                // Guardamos el Animator que tiene controller asignado, para forzar su idle
+                animatorsPreview[i] = BuscarAnimatorConController(preview);
             }
-            render.material.color = datos.color;
+            else
+            {
+                preview = CrearPreviewPrimitiva(datos, shaderUnlit);
+            }
 
             preview.SetActive(false);
             previewsPersonajes[i] = preview;
@@ -199,6 +199,122 @@ public class MenuPrincipal : MonoBehaviour
 
         indicePersonajeMostrado = SeleccionPersonaje.IndiceElegido;
         RefrescarRuleta();
+    }
+
+    // Primer Animator del modelo con un controller asignado (el que de verdad anima); si
+    // ninguno lo tiene, cae al primero que haya. Devuelve null si no hay Animators.
+    Animator BuscarAnimatorConController(GameObject modelo)
+    {
+        Animator[] animators = modelo.GetComponentsInChildren<Animator>();
+        foreach (Animator a in animators)
+        {
+            if (a.runtimeAnimatorController != null)
+            {
+                return a;
+            }
+        }
+        return animators.Length > 0 ? animators[0] : null;
+    }
+
+    // Acomoda un modelo instanciado para que se vea bien en la ruleta: normaliza su
+    // altura (los FBX de Max traen escalas raras), lo centra frente a la cámara del
+    // menú y le pone material Unlit para que no se vea negro (la escena no tiene luces).
+    void AjustarPreviewModelo(GameObject preview, Shader shaderUnlit)
+    {
+        // Los colliders del prefab no sirven en el menú
+        foreach (Collider col in preview.GetComponentsInChildren<Collider>())
+        {
+            Destroy(col);
+        }
+
+        // Dejamos el Animator activo para que reproduzca su estado por defecto (idle):
+        // así el modelo se ve quieto/respirando en la ruleta en vez de congelado en la
+        // pose con la que quedó importado el FBX (que en el Mago es un frame de la corrida).
+        // Desactivamos root motion para que la animación no desplace el preview de su sitio.
+        foreach (Animator anim in preview.GetComponentsInChildren<Animator>())
+        {
+            anim.applyRootMotion = false;
+        }
+
+        Renderer[] renderers = preview.GetComponentsInChildren<Renderer>();
+
+        // Material Unlit conservando la textura original (mainTexture) de cada material,
+        // así el modelo se ve con sus colores y no en negro.
+        if (shaderUnlit != null)
+        {
+            foreach (Renderer render in renderers)
+            {
+                Material[] mats = render.materials;
+                for (int m = 0; m < mats.Length; m++)
+                {
+                    Texture tex = mats[m] != null ? mats[m].mainTexture : null;
+                    Material nuevo = new Material(shaderUnlit);
+                    if (tex != null) nuevo.mainTexture = tex;
+                    mats[m] = nuevo;
+                }
+                render.materials = mats;
+            }
+        }
+
+        // Normalizamos la altura del modelo a la misma que tenían las primitivas (~1.4).
+        const float alturaObjetivo = 1.4f;
+        if (renderers.Length > 0)
+        {
+            Bounds bounds = renderers[0].bounds;
+            for (int r = 1; r < renderers.Length; r++)
+            {
+                bounds.Encapsulate(renderers[r].bounds);
+            }
+
+            if (bounds.size.y > 0.0001f)
+            {
+                preview.transform.localScale *= alturaObjetivo / bounds.size.y;
+            }
+        }
+
+        // Centramos frente a la cámara del menú (en 0,1,-10 mirando hacia +Z) midiendo de
+        // nuevo los bounds ya escalados, para apoyar al modelo por su centro real.
+        renderers = preview.GetComponentsInChildren<Renderer>();
+        Vector3 centroActual = preview.transform.position;
+        if (renderers.Length > 0)
+        {
+            Bounds bounds = renderers[0].bounds;
+            for (int r = 1; r < renderers.Length; r++)
+            {
+                bounds.Encapsulate(renderers[r].bounds);
+            }
+            centroActual = bounds.center;
+        }
+        Vector3 destino = new Vector3(0f, 1f, -7f);
+        preview.transform.position += destino - centroActual;
+
+        // De frente a la cámara
+        preview.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+    }
+
+    GameObject CrearPreviewPrimitiva(SeleccionPersonaje.DatosPersonaje datos, Shader shaderUnlit)
+    {
+        PrimitiveType primitiva = PrimitiveType.Capsule;
+        if (datos.forma == SeleccionPersonaje.Forma.Cubo) primitiva = PrimitiveType.Cube;
+        if (datos.forma == SeleccionPersonaje.Forma.Esfera) primitiva = PrimitiveType.Sphere;
+
+        GameObject preview = GameObject.CreatePrimitive(primitiva);
+        preview.name = "Preview_" + datos.nombre;
+
+        // Frente a la cámara del menú (está en 0,1,-10 mirando hacia +Z)
+        preview.transform.position = new Vector3(0f, 1f, -7f);
+        preview.transform.localScale = Vector3.one * 1.4f;
+
+        // El collider de la primitiva no sirve para nada en el menú
+        Destroy(preview.GetComponent<Collider>());
+
+        Renderer render = preview.GetComponent<Renderer>();
+        if (shaderUnlit != null)
+        {
+            render.material = new Material(shaderUnlit);
+        }
+        render.material.color = datos.color;
+        return preview;
     }
 
     void CambiarPersonaje(int direccion)
@@ -233,9 +349,40 @@ public class MenuPrincipal : MonoBehaviour
 
         for (int i = 0; i < previewsPersonajes.Length; i++)
         {
-            if (previewsPersonajes[i] != null)
+            if (previewsPersonajes[i] == null)
             {
-                previewsPersonajes[i].SetActive(ruletaAbierta && i == indicePersonajeMostrado);
+                continue;
+            }
+
+            bool visible = ruletaAbierta && i == indicePersonajeMostrado;
+            previewsPersonajes[i].SetActive(visible);
+
+            // Al mostrarlo, forzamos su estado quieto (idle) y evaluamos el primer frame ya
+            // mismo, para que no aparezca un instante en la pose con la que vino el FBX
+            // (en el Mago, un frame de la corrida). El nombre del estado lo trae cada
+            // personaje en datos.estadoIdle (los controllers lo nombran distinto).
+            if (visible && animatorsPreview != null && animatorsPreview[i] != null)
+            {
+                string estadoIdle = SeleccionPersonaje.Personajes[i].estadoIdle;
+                Animator anim = animatorsPreview[i];
+
+                // Los parámetros float (Velocidad, etc.) traen un valor por defecto del
+                // controller que en el Mago es 2: eso dispara la transición idle->Correr y
+                // hace que el preview corra. En el menú no hay quien los actualice, así que
+                // los forzamos a 0 para que el modelo se quede quieto (e idle del blend tree).
+                foreach (AnimatorControllerParameter p in anim.parameters)
+                {
+                    if (p.type == AnimatorControllerParameterType.Float)
+                    {
+                        anim.SetFloat(p.name, 0f);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(estadoIdle))
+                {
+                    anim.Play(estadoIdle, 0, 0f);
+                }
+                anim.Update(0f);
             }
         }
     }

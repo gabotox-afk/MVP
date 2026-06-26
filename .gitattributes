@@ -178,4 +178,8 @@ Assets/Ninja/**/*.fbx -filter -diff -merge
 Assets/Ninja/*.fbx -filter -diff -merge
 Assets/Ninja/**/*.jpg -filter -diff -merge
 Assets/Ninja/**/*.png -filter -diff -merge
+Assets/Cobarius/**/*.fbx -filter -diff -merge
+Assets/Cobarius/*.fbx -filter -diff -merge
+Assets/Cobarius/**/*.jpg -filter -diff -merge
+Assets/Cobarius/**/*.png -filter -diff -merge
 Assets/TutorialInfo/**/* -filter -diff -merge
