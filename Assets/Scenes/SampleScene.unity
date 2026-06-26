@@ -179,8 +179,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 708ed2fd96fa4153b3fff17ce95faed7, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   bailes:
   - etiqueta: Baile 1
     trigger: Baile1
@@ -1102,6 +1102,7 @@ MonoBehaviour:
   prefabTorretaCadena: {fileID: 492361273839947981, guid: 2cd8153ff1b1eb44ba1cfb01557b10c0, type: 3}
   prefabTorretaNinja: {fileID: 492361273839947981, guid: 7cd9d136f6c6c27488b7c6a04fe0eded, type: 3}
   factorAlturaModelo: 1
+  offsetAlturaModelo: 0
   limites:
   - tag: Muro
     maximo: 5
@@ -1114,6 +1115,8 @@ MonoBehaviour:
   - tag: TorretaNinja
     maximo: 2
   cooldownTorreta: 5
+  fuerzaSalto: 9
+  gravedad: -20
 --- !u!136 &1058959896
 CapsuleCollider:
   m_ObjectHideFlags: 0

@@ -57,6 +57,12 @@ public class Jugador : MonoBehaviour
     // Por cada tag de torreta, el instante (Time.time) en que se libera su cooldown
     private readonly Dictionary<string, float> proximaColocacion = new Dictionary<string, float>();
 
+    [Header("Configuracion de Salto")]
+    public float fuerzaSalto = 7f;
+    [SerializeField] private float gravedad = -20f;
+    private float velocidadVertical = 0f;
+    private bool estaEnElSuelo = true;
+
     private CapsuleCollider miCollider;
     private HUDJuego hud;
     private Animator animator;
@@ -290,6 +296,8 @@ public class Jugador : MonoBehaviour
 
     void MoverJugador()
     {
+        AplicarFisicaVertical();
+
         // Sin cámara no podemos calcular la dirección relativa: salimos sin crashear
         if (camaraPrincipal == null)
         {
@@ -394,6 +402,15 @@ public class Jugador : MonoBehaviour
             if (impacto.collider == miCollider)
             {
                 continue;
+            }
+
+            // Si estamos en el aire y los pies ya superan el tope del obstáculo,
+            // lo ignoramos: el salto lo pasa por arriba
+            if (!estaEnElSuelo)
+            {
+                float pie = centro.y - miCollider.height * 0.5f;
+                if (pie > impacto.collider.bounds.max.y - 0.05f)
+                    continue;
             }
 
             hit = impacto;
@@ -510,6 +527,75 @@ public class Jugador : MonoBehaviour
     int ContarVivos(string tag)
     {
         return GameObject.FindGameObjectsWithTag(tag).Length;
+    }
+
+    void AplicarFisicaVertical()
+    {
+        // Si estábamos parados pero ya no hay suelo (caída de borde), empezamos a caer
+        if (estaEnElSuelo && DistanciaAlSuelo() > 0.2f)
+        {
+            estaEnElSuelo = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && estaEnElSuelo)
+        {
+            velocidadVertical = fuerzaSalto;
+            estaEnElSuelo = false;
+            SetAnimatorTriggerSafe("Saltar");
+        }
+
+        if (!estaEnElSuelo)
+        {
+            velocidadVertical += gravedad * Time.deltaTime;
+            float deltaY = velocidadVertical * Time.deltaTime;
+
+            if (velocidadVertical < 0f)
+            {
+                float dist = DistanciaAlSuelo();
+                if (dist != float.MaxValue && dist <= Mathf.Abs(deltaY) + 0.1f)
+                {
+                    transform.position += Vector3.down * Mathf.Max(0f, dist);
+                    velocidadVertical = 0f;
+                    estaEnElSuelo = true;
+                    SetAnimatorBoolSafe("EnElAire", false);
+                    return;
+                }
+            }
+
+            transform.Translate(Vector3.up * deltaY, Space.World);
+            SetAnimatorBoolSafe("EnElAire", true);
+        }
+    }
+
+    float DistanciaAlSuelo()
+    {
+        if (miCollider == null) return float.MaxValue;
+        Vector3 centro = transform.TransformPoint(miCollider.center);
+        float mitad = miCollider.height * 0.5f;
+
+        RaycastHit[] hits = Physics.RaycastAll(centro, Vector3.down, mitad + 0.5f, ~0, QueryTriggerInteraction.Ignore);
+        float min = float.MaxValue;
+        foreach (RaycastHit hit in hits)
+            if (hit.collider != miCollider && hit.distance < min)
+                min = hit.distance;
+
+        return min == float.MaxValue ? float.MaxValue : min - mitad;
+    }
+
+    void SetAnimatorTriggerSafe(string nombre)
+    {
+        if (animator == null) return;
+        foreach (AnimatorControllerParameter p in animator.parameters)
+            if (p.name == nombre && p.type == AnimatorControllerParameterType.Trigger)
+            { animator.SetTrigger(nombre); return; }
+    }
+
+    void SetAnimatorBoolSafe(string nombre, bool valor)
+    {
+        if (animator == null) return;
+        foreach (AnimatorControllerParameter p in animator.parameters)
+            if (p.name == nombre && p.type == AnimatorControllerParameterType.Bool)
+            { animator.SetBool(nombre, valor); return; }
     }
 
     void EmpujarEstructurasAdelante()
