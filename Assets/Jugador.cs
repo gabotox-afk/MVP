@@ -47,11 +47,13 @@ public class Jugador : MonoBehaviour
 
     private CapsuleCollider miCollider;
     private HUDJuego hud;
+    private Animator animator;
 
     void Start()
     {
         miCollider = GetComponent<CapsuleCollider>();
         hud = FindAnyObjectByType<HUDJuego>();
+        animator = GetComponentInChildren<Animator>();
 
         // Si nadie arrastró la cámara en el Inspector, usamos la principal de la escena
         if (camaraPrincipal == null && Camera.main != null)
@@ -153,6 +155,8 @@ public class Jugador : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            if (animator != null)
+                animator.SetTrigger("Empuje");
             EmpujarEstructurasAdelante();
         }
     }
@@ -172,6 +176,9 @@ public class Jugador : MonoBehaviour
         Vector3 direccionInput = new Vector3(movimientoH, 0.0f, movimientoV).normalized;
 
         // 2. Si el jugador está presionando alguna tecla...
+        if (animator != null)
+            animator.SetFloat("Speed", direccionInput.magnitude);
+
         if (direccionInput.magnitude >= 0.1f)
         {
             // Buscamos hacia dónde está apuntando el frente y el costado de la cámara
