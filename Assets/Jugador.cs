@@ -26,6 +26,18 @@ public class Jugador : MonoBehaviour
     public GameObject prefabTorretaCadena; // Cobarius
     public GameObject prefabTorretaNinja;  // Ninja
 
+    [Header("Modelo visual del personaje")]
+    // El modelo de cada personaje se carga por nombre desde Resources/Personajes/<nombre>
+    // (ver SeleccionPersonaje.DatosPersonaje.CargarModelo). Cada prefab trae su propio
+    // Animator con sus animaciones y se instancia como hijo del jugador.
+    // Multiplicador final sobre el ajuste automático de tamaño, por si querés que el
+    // modelo sobresalga un poco de la cápsula o quede más bajo (1 = misma altura exacta).
+    public float factorAlturaModelo = 1f;
+
+    // Empuje vertical manual extra sobre el alineado automático al piso
+    // (0 = base exacta en el piso; + sube el modelo, − lo hunde).
+    public float offsetAlturaModelo = 0f;
+
     // Limite de cuantas estructuras de un tipo puede haber vivas a la vez.
     // Se cuenta por tag: cada prefab construible debe tener su tag asignado
     // en el Inspector (Muro, Torreta, TorretaAOE, etc.)
@@ -53,8 +65,6 @@ public class Jugador : MonoBehaviour
     {
         miCollider = GetComponent<CapsuleCollider>();
         hud = FindAnyObjectByType<HUDJuego>();
-        // El Animator puede estar en este objeto o en un hijo (el modelo visual)
-        animator = GetComponentInChildren<Animator>();
 
         // Si nadie arrastró la cámara en el Inspector, usamos la principal de la escena
         if (camaraPrincipal == null && Camera.main != null)
@@ -128,6 +138,109 @@ public class Jugador : MonoBehaviour
         {
             render.material.color = SeleccionPersonaje.Elegido.color;
         }
+
+        InstanciarModeloPersonaje(indice);
+    }
+
+    // Crea el modelo visual (con su Animator y animaciones) del personaje elegido
+    // como hijo del jugador, y cachea su Animator para mover las animaciones.
+    void InstanciarModeloPersonaje(int indice)
+    {
+        if (indice < 0 || indice >= SeleccionPersonaje.Personajes.Length)
+        {
+            // Índice fuera de rango: dejamos lo que ya haya de hijo en escena
+            animator = GetComponentInChildren<Animator>();
+            return;
+        }
+
+        // El personaje resuelve su propio prefab por nombre (Resources/Personajes/<nombre>)
+        GameObject prefab = SeleccionPersonaje.Personajes[indice].CargarModelo();
+        if (prefab == null)
+        {
+            // Sin prefab para este personaje: dejamos lo que ya haya de hijo en escena
+            animator = GetComponentInChildren<Animator>();
+            return;
+        }
+
+        // El modelo se ancla al jugador en su posición local cero, mirando al frente.
+        GameObject modelo = Instantiate(prefab, transform);
+        modelo.transform.localPosition = Vector3.zero;
+        modelo.transform.localRotation = Quaternion.identity;
+
+        // Ajustamos el tamaño del modelo a la altura de la cápsula del jugador, así
+        // no dependemos de la escala con la que venga el prefab (los FBX de 3ds Max
+        // traen escalas raras). Si algo falla, dejamos la escala original del prefab.
+        AjustarEscalaModelo(modelo);
+
+        // El Animator que controlan las animaciones es el del modelo recién creado.
+        // El modelo puede traer varios Animator anidados (FBX de Max): nos quedamos
+        // con el que tenga un Controller asignado, que es el que de verdad anima.
+        animator = BuscarAnimatorConController(modelo);
+    }
+
+    // Devuelve el primer Animator del modelo que tenga un runtimeAnimatorController
+    // asignado. Si ninguno lo tiene, cae al primero que encuentre.
+    Animator BuscarAnimatorConController(GameObject modelo)
+    {
+        Animator[] animators = modelo.GetComponentsInChildren<Animator>();
+        foreach (Animator a in animators)
+        {
+            if (a.runtimeAnimatorController != null)
+            {
+                return a;
+            }
+        }
+        return animators.Length > 0 ? animators[0] : null;
+    }
+
+    // Escala el modelo para que su altura iguale (por factorAlturaModelo) la altura de la
+    // cápsula del jugador y luego asienta su base en el piso. Mide el modelo con los bounds
+    // de TODOS sus renderers (la malla es skinned, un solo nodo no alcanza para medir bien).
+    void AjustarEscalaModelo(GameObject modelo)
+    {
+        if (miCollider == null)
+        {
+            return;
+        }
+
+        Renderer[] renderers = modelo.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0)
+        {
+            return;
+        }
+
+        float alturaModelo = BoundsDelModelo(renderers).size.y;
+        if (alturaModelo <= 0.0001f)
+        {
+            return;
+        }
+
+        // La cápsula da la altura objetivo (height ya viene en escala de mundo del jugador)
+        float alturaObjetivo = miCollider.height * factorAlturaModelo;
+
+        float factor = alturaObjetivo / alturaModelo;
+        modelo.transform.localScale *= factor;
+
+        // Tras escalar, el pivot del modelo sigue anclado al centro del jugador, así que
+        // los pies suelen quedar flotando. Bajamos el modelo para que su base (bounds.min.y,
+        // ya en la escala nueva) coincida con el piso de la cápsula. Se mide por bounds, no
+        // por el pivot del prefab, así funciona con cualquier modelo.
+        float pisoY = transform.TransformPoint(miCollider.center).y
+            - miCollider.height * 0.5f * transform.lossyScale.y;
+        float baseModeloY = BoundsDelModelo(renderers).min.y;
+        float delta = pisoY - baseModeloY + offsetAlturaModelo;
+        modelo.transform.position += Vector3.up * delta;
+    }
+
+    // Bounds combinados (en mundo) de todos los renderers del modelo en su escala actual.
+    Bounds BoundsDelModelo(Renderer[] renderers)
+    {
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            bounds.Encapsulate(renderers[i].bounds);
+        }
+        return bounds;
     }
 
     void Update()

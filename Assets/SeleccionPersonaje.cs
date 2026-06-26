@@ -20,6 +20,14 @@ public static class SeleccionPersonaje
             this.color = color;
             this.forma = forma;
         }
+
+        // Carga el prefab de modelo visual de este personaje por convención de nombre
+        // desde Assets/Resources/Personajes/<nombre>.prefab. Devuelve null si no existe
+        // (el llamador decide el fallback). Agregar un modelo = soltar el prefab ahí.
+        public GameObject CargarModelo()
+        {
+            return Resources.Load<GameObject>("Personajes/" + nombre);
+        }
     }
 
     public const int Mago = 0;
