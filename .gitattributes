@@ -169,3 +169,8 @@ Packages/packages-lock.json linguist-generated
 
 # Exceptions for .asset files such as lightning pre-baking
 LightingData.asset     binary
+
+# Entrega: estos assets se versionan como binarios normales (LFS sin cupo)
+Assets/Mago/**/*.fbx -filter -diff -merge
+Assets/Mago/*.fbx -filter -diff -merge
+Assets/Mago/**/*.jpg -filter -diff -merge

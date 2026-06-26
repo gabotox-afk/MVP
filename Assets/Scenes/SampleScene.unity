@@ -119,6 +119,115 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &200000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 200001}
+  - component: {fileID: 200002}
+  m_Layer: 0
+  m_Name: MenuPausa
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &200001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 200000}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &200002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 200000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 110db684280247e884f2cb514d125b01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  escenaMenuInicial: MenuPrincipal
+  colorFondo: {r: 0, g: 0, b: 0, a: 0.7}
+  colorBoton: {r: 0.17, g: 0.24, b: 0.35, a: 1}
+  colorBotonResaltado: {r: 0.25, g: 0.36, b: 0.52, a: 1}
+  colorTexto: {r: 1, g: 1, b: 1, a: 1}
+--- !u!1 &300000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 300001}
+  - component: {fileID: 300002}
+  m_Layer: 0
+  m_Name: HUDJuego
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &300001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 300000}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &300002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 300000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ba27b5a2905499b9caa9c1ba003cd7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  escenaMenuInicial: MenuPrincipal
+  colorVidaLlena: {r: 0.3, g: 0.8, b: 0.35, a: 1}
+  colorVidaVacia: {r: 0.85, g: 0.25, b: 0.2, a: 1}
+  colorBoton: {r: 0.17, g: 0.24, b: 0.35, a: 1}
+  colorBotonResaltado: {r: 0.25, g: 0.36, b: 0.52, a: 1}
+  nombresEstructuras:
+  - tag: Muro
+    nombre: Muros
+  - tag: Torreta
+    nombre: Torretas
+  - tag: TorretaAOE
+    nombre: Torreta AOE
+  - tag: TorretaCadena
+    nombre: Torreta Cadena
+  - tag: TorretaNinja
+    nombre: Torreta Ninja
 --- !u!1 &3192427
 GameObject:
   m_ObjectHideFlags: 0
@@ -892,6 +1001,92 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &942603129
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1058959899}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.12269723
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.12269723
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.12269723
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.089
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_Name
+      value: Modelado Correr
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 6474deb5135653740854053a9efdfcda, type: 2}
+    - target: {fileID: 5866666021909216657, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_WarningMessage
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+--- !u!4 &942603130 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d1a4d3fe702cc644194abe23000542e1, type: 3}
+  m_PrefabInstance: {fileID: 942603129}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1017265785
 GameObject:
   m_ObjectHideFlags: 0
@@ -960,6 +1155,7 @@ MonoBehaviour:
   camaraPrincipal: {fileID: 330585546}
   fuerzaDeEmpuje: 15
   radioDeGolpe: 3
+  anguloConoEmpuje: 90
   distanciaConstruccion: 2
   prefabMuro: {fileID: 2423286658616931685, guid: 4554b724eb3be8643b40173c8e6c546d, type: 3}
   prefabTorreta: {fileID: 171775808377693, guid: 4c755e0ecdd72704c95fad4459036b39, type: 3}
@@ -978,6 +1174,7 @@ MonoBehaviour:
     maximo: 2
   - tag: TorretaNinja
     maximo: 2
+  cooldownTorreta: 5
 --- !u!136 &1058959896
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1008,7 +1205,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1058959894}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1070,7 +1267,8 @@ Transform:
   m_LocalPosition: {x: -0.52, y: 1.003, z: 3.19}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 942603130}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1168057890
@@ -1113,6 +1311,12 @@ MonoBehaviour:
   totalOleadas: 10
   enemigosOleadaBase: 5
   enemigosPorOleadaExtra: 2
+  incrementoVidaPorOleada: 0.2
+  incrementoDanioPorOleada: 0.2
+  incrementoVelocidadPorOleada: 0.08
+  velocidadMaxima: 15
+  multiplicadorCada10: 1.5
+  multiplicadorCada100: 4
   modoInfinito: 0
 --- !u!4 &1168057892
 Transform:
@@ -1129,105 +1333,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &200000
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 200001}
-  - component: {fileID: 200002}
-  m_Layer: 0
-  m_Name: MenuPausa
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &200001
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 200000}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &200002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 200000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 110db684280247e884f2cb514d125b01, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
---- !u!1 &300000
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 300001}
-  - component: {fileID: 300002}
-  m_Layer: 0
-  m_Name: HUDJuego
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &300001
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 300000}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &300002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 300000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ba27b5a2905499b9caa9c1ba003cd7a, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  nombresEstructuras:
-  - tag: Muro
-    nombre: Muros
-  - tag: Torreta
-    nombre: Torretas
-  - tag: TorretaAOE
-    nombre: Torreta AOE
-  - tag: TorretaCadena
-    nombre: Torreta Cadena
-  - tag: TorretaNinja
-    nombre: Torreta Ninja
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -47,11 +47,14 @@ public class Jugador : MonoBehaviour
 
     private CapsuleCollider miCollider;
     private HUDJuego hud;
+    private Animator animator;
 
     void Start()
     {
         miCollider = GetComponent<CapsuleCollider>();
         hud = FindAnyObjectByType<HUDJuego>();
+        // El Animator puede estar en este objeto o en un hijo (el modelo visual)
+        animator = GetComponentInChildren<Animator>();
 
         // Si nadie arrastró la cámara en el Inspector, usamos la principal de la escena
         if (camaraPrincipal == null && Camera.main != null)
@@ -153,6 +156,10 @@ public class Jugador : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            if (animator != null)
+            {
+                animator.SetTrigger("Empujar");
+            }
             EmpujarEstructurasAdelante();
         }
     }
@@ -170,6 +177,14 @@ public class Jugador : MonoBehaviour
         float movimientoV = Input.GetAxisRaw("Vertical");
 
         Vector3 direccionInput = new Vector3(movimientoH, 0.0f, movimientoV).normalized;
+
+        // Avisamos al Animator cuánto nos movemos (0 = quieto, 1 = caminando) para
+        // que mezcle entre idle y caminar. Usamos el input crudo, no la posición:
+        // así la animación de caminar sigue aunque un muro nos frene de verdad.
+        if (animator != null)
+        {
+            animator.SetFloat("Velocidad", direccionInput.magnitude);
+        }
 
         // 2. Si el jugador está presionando alguna tecla...
         if (direccionInput.magnitude >= 0.1f)
